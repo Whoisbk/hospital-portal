@@ -28,6 +28,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
   SidebarSeparator,
+  useSidebar,
 } from '@/components/ui/sidebar'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
@@ -57,6 +58,7 @@ export function AppSidebar() {
   const { user, logout } = useAuth()
   const pathname = usePathname()
   const router = useRouter()
+  const { state } = useSidebar()
 
   const navigationItems = user?.role === 'receptionist' ? receptionistItems : doctorItems
 
@@ -72,20 +74,22 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" className="gap-3 hover:bg-sidebar-accent" asChild>
               <Link href="/dashboard">
-                <div className="flex items-center justify-center size-8 rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                <div className="flex items-center justify-center size-8 rounded-lg bg-sidebar-primary text-sidebar-primary-foreground shrink-0">
                   <Stethoscope className="size-4" />
                 </div>
-                <div className="flex flex-col leading-none">
-                  <span className="font-semibold text-sm">MediCare</span>
-                  <span className="text-xs opacity-70">Hospital Portal</span>
-                </div>
+                {state === 'expanded' && (
+                  <div className="flex flex-col leading-none">
+                    <span className="font-semibold text-sm">MediCare</span>
+                    <span className="text-xs opacity-70">Hospital Portal</span>
+                  </div>
+                )}
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarSeparator />
+      {/* <SidebarSeparator /> */}
 
       <SidebarContent>
         <SidebarGroup>
