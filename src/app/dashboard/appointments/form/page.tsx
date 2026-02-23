@@ -7,13 +7,28 @@ import Header from "@/components/layout/header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Calendar as CalendarIcon, User, CheckCircle, Trash2, Stethoscope } from "lucide-react";
-import { Appointment, Patient } from "@/types";
+import { Separator } from "@/components/ui/separator";
+import {
+    Calendar as CalendarIcon,
+    User,
+    CheckCircle,
+    Trash2,
+    Stethoscope,
+    Clock,
+    FileText,
+    AlertCircle,
+    ArrowLeft,
+    Phone,
+    Mail,
+    Activity,
+} from "lucide-react";
+import { Appointment } from "@/types";
 import { MOCK_PATIENTS, MOCK_DOCTORS } from "@/lib/mock-data";
-import { MockAppointmentService, CreateAppointmentData } from "@/lib/services/appointment-service";
+import { MockAppointmentService } from "@/lib/services/appointment-service";
 
 export default function AppointmentFormPage() {
     const router = useRouter();
@@ -37,7 +52,7 @@ export default function AppointmentFormPage() {
     const [isDeleting, setIsDeleting] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const patients = useMemo<Patient[]>(() => MOCK_PATIENTS, []);
+    const patients = useMemo(() => MOCK_PATIENTS , []);
     const doctors = useMemo(() => MOCK_DOCTORS, []);
 
     useEffect(() => {
@@ -139,11 +154,17 @@ export default function AppointmentFormPage() {
                     title="Access Denied"
                     description="You don't have permission to access this page"
                 />
-                <div className="flex-1 flex items-center justify-center">
-                    <Card>
-                        <CardContent className="pt-6">
-                            <p className="text-gray-600">Only reception staff can create or edit appointments.</p>
-                            <Button onClick={() => router.back()} className="mt-4">
+                <div className="flex-1 flex items-center justify-center p-6">
+                    <Card className="max-w-md w-full border-destructive/20">
+                        <CardContent className="pt-6 text-center">
+                            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
+                                <AlertCircle className="h-6 w-6 text-destructive" />
+                            </div>
+                            <p className="text-muted-foreground">
+                                Only reception staff can create or edit appointments.
+                            </p>
+                            <Button onClick={() => router.back()} variant="outline" className="mt-6">
+                                <ArrowLeft className="mr-2 h-4 w-4" />
                                 Go Back
                             </Button>
                         </CardContent>
@@ -154,264 +175,461 @@ export default function AppointmentFormPage() {
     }
 
     return (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full bg-muted/30">
             <Header
                 title={isEditing ? "Edit Appointment" : "New Appointment"}
                 description={isEditing ? "Update appointment details" : "Schedule a new patient appointment"}
             />
 
-            <div className="flex-1 overflow-auto p-6">
-                <div className="max-w-3xl mx-auto">
-                    <Card>
-                        <CardHeader>
-                            <div className="flex items-center gap-3">
-                                <div className="bg-blue-100 p-2 rounded-lg">
-                                    <CalendarIcon className="h-6 w-6 text-blue-600" />
-                                </div>
-                                <div>
-                                    <CardTitle>{isEditing ? "Edit Appointment" : "New Appointment"}</CardTitle>
-                                    <CardDescription>
-                                        {isEditing ? "Adjust appointment information" : "Fill out the form to schedule an appointment"}
-                                    </CardDescription>
-                                </div>
-                                {isEditing && (
-                                    <div className="ml-auto">
-                                        <Button variant="destructive" onClick={handleDelete} disabled={isDeleting} className="flex items-center gap-2">
-                                            <Trash2 className="h-4 w-4" />
+            <div className="flex-1 overflow-auto p-4 md:p-8">
+                <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* Main Form */}
+                    <div className="lg:col-span-2">
+                        <Card className="shadow-sm border-border/60">
+                            <CardHeader className="pb-4">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                                            <CalendarIcon className="h-5 w-5 text-primary" />
+                                        </div>
+                                        <div>
+                                            <CardTitle className="text-lg">
+                                                {isEditing ? "Edit Appointment" : "Schedule Appointment"}
+                                            </CardTitle>
+                                            <CardDescription>
+                                                {isEditing
+                                                    ? "Modify existing appointment details"
+                                                    : "Fill in the details to book a new appointment"}
+                                            </CardDescription>
+                                        </div>
+                                    </div>
+                                    {isEditing && (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={handleDelete}
+                                            disabled={isDeleting}
+                                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                        >
+                                            <Trash2 className="h-4 w-4 mr-1.5" />
                                             {isDeleting ? "Deleting..." : "Delete"}
                                         </Button>
-                                    </div>
-                                )}
-                            </div>
-                        </CardHeader>
-
-                        <CardContent>
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                {/* Appointment Details */}
-                                <div>
-                                    <h3 className="text-lg font-semibold mb-4">Appointment Details</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <label htmlFor="patient" className="text-sm font-medium">Patient *</label>
-                                            <Select value={formData.patientId ?? ""} onValueChange={(v) => handleChange("patientId", v)}>
-                                                <SelectTrigger id="patient">
-                                                    <SelectValue placeholder="Select patient" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {patients.map((p) => (
-                                                        <SelectItem key={p.id} value={p.id}>
-                                                            {p.firstName} {p.lastName}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            {errors.patientId && <p className="text-sm text-red-500">{errors.patientId}</p>}
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <label htmlFor="doctor" className="text-sm font-medium">Doctor *</label>
-                                            <Select value={formData.doctorId ?? ""} onValueChange={(v) => handleChange("doctorId", v)}>
-                                                <SelectTrigger id="doctor">
-                                                    <SelectValue placeholder="Select doctor" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {doctors.map((d) => (
-                                                        <SelectItem key={d.id} value={d.id}>
-                                                            <div className="flex items-center gap-2">
-                                                                <span>{d.name}</span>
-                                                                {d.specialization && (
-                                                                    <span className="text-xs text-gray-500">
-                                                                        ({d.specialization})
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                            {errors.doctorId && <p className="text-sm text-red-500">{errors.doctorId}</p>}
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <label htmlFor="date" className="text-sm font-medium">Date *</label>
-                                            <Input
-                                                id="date"
-                                                type="date"
-                                                value={formData.date ?? ""}
-                                                onChange={(e) => handleChange("date", e.target.value)}
-                                            />
-                                            {errors.date && <p className="text-sm text-red-500">{errors.date}</p>}
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <label htmlFor="time" className="text-sm font-medium">Time *</label>
-                                            <Input
-                                                id="time"
-                                                type="time"
-                                                value={formData.time ?? ""}
-                                                onChange={(e) => handleChange("time", e.target.value)}
-                                            />
-                                            {errors.time && <p className="text-sm text-red-500">{errors.time}</p>}
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <label htmlFor="type" className="text-sm font-medium">Appointment Type *</label>
-                                            <Select value={formData.type ?? "consultation"} onValueChange={(v) => handleChange("type", v)}>
-                                                <SelectTrigger id="type">
-                                                    <SelectValue placeholder="Select type" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="consultation">Consultation</SelectItem>
-                                                    <SelectItem value="follow-up">Follow-up</SelectItem>
-                                                    <SelectItem value="emergency">Emergency</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            {errors.type && <p className="text-sm text-red-500">{errors.type}</p>}
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2 mt-4">
-                                        <label htmlFor="visitReason" className="text-sm font-medium">Visit Reason</label>
-                                        <Input
-                                            id="visitReason"
-                                            placeholder="e.g., Annual checkup, Follow-up on test results"
-                                            value={formData.visitReason ?? ""}
-                                            onChange={(e) => handleChange("visitReason", e.target.value)}
-                                        />
-                                        <p className="text-xs text-gray-500">Brief description of the visit purpose</p>
-                                    </div>
-
-                                    <div className="space-y-2 mt-4">
-                                        <label htmlFor="notes" className="text-sm font-medium">Internal Notes</label>
-                                        <Textarea
-                                            id="notes"
-                                            placeholder="Add any additional notes (internal only)..."
-                                            value={formData.notes ?? ""}
-                                            onChange={(e) => handleChange("notes", e.target.value)}
-                                            className="min-h-[90px]"
-                                        />
-                                        <p className="text-xs text-gray-500">
-                                            These notes are for internal use only and not visible to patients
-                                        </p>
-                                    </div>
+                                    )}
                                 </div>
+                            </CardHeader>
 
-                                {/* Status (only when editing) */}
-                                {isEditing && (
-                                    <div>
-                                        <h3 className="text-lg font-semibold mb-4">Status</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Separator />
+
+                            <CardContent className="pt-6">
+                                <form onSubmit={handleSubmit} className="space-y-8">
+                                    {/* Patient & Doctor Selection */}
+                                    <section>
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <User className="h-4 w-4 text-muted-foreground" />
+                                            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">
+                                                Patient & Doctor
+                                            </h3>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                             <div className="space-y-2">
-                                                <label htmlFor="status" className="text-sm font-medium">Appointment Status</label>
-                                                <Select value={formData.status ?? "pending"} onValueChange={(v) => handleChange("status", v)}>
-                                                    <SelectTrigger id="status">
-                                                        <SelectValue />
+                                                <Label htmlFor="patient">
+                                                    Patient <span className="text-destructive">*</span>
+                                                </Label>
+                                                <Select
+                                                    value={formData.patientId ?? ""}
+                                                    onValueChange={(v) => handleChange("patientId", v)}
+                                                >
+                                                    <SelectTrigger
+                                                        id="patient"
+                                                        className={errors.patientId ? "border-destructive ring-destructive/20" : ""}
+                                                    >
+                                                        <SelectValue placeholder="Search or select patient..." />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="pending">Pending</SelectItem>
-                                                        <SelectItem value="confirmed">Confirmed</SelectItem>
-                                                        <SelectItem value="in-progress">In Progress</SelectItem>
-                                                        <SelectItem value="completed">Completed</SelectItem>
-                                                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                                                        {patients.map((p) => (
+                                                            <SelectItem key={p.id} value={p.id}>
+                                                                <span className="font-medium">
+                                                                    {p.firstName} {p.lastName}
+                                                                </span>
+                                                            </SelectItem>
+                                                        ))}
                                                     </SelectContent>
                                                 </Select>
+                                                {errors.patientId && (
+                                                    <p className="text-xs text-destructive flex items-center gap-1">
+                                                        <AlertCircle className="h-3 w-3" />
+                                                        {errors.patientId}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label htmlFor="doctor">
+                                                    Doctor <span className="text-destructive">*</span>
+                                                </Label>
+                                                <Select
+                                                    value={formData.doctorId ?? ""}
+                                                    onValueChange={(v) => handleChange("doctorId", v)}
+                                                >
+                                                    <SelectTrigger
+                                                        id="doctor"
+                                                        className={errors.doctorId ? "border-destructive ring-destructive/20" : ""}
+                                                    >
+                                                        <SelectValue placeholder="Select attending doctor..." />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {doctors.map((d) => (
+                                                            <SelectItem key={d.id} value={d.id}>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="font-medium">{d.name}</span>
+                                                                    {d.specialization && (
+                                                                        <span className="text-xs text-muted-foreground">
+                                                                            &middot; {d.specialization}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                {errors.doctorId && (
+                                                    <p className="text-xs text-destructive flex items-center gap-1">
+                                                        <AlertCircle className="h-3 w-3" />
+                                                        {errors.doctorId}
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
-                                        {formData.status === "cancelled" && formData.cancelReason && (
-                                            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                                                <p className="text-sm font-medium text-red-800">Cancellation Reason:</p>
-                                                <p className="text-sm text-red-700 mt-1">{formData.cancelReason}</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
+                                    </section>
 
-                                {/* Submit */}
-                                <div className="flex gap-4 pt-2">
-                                    <Button type="button" variant="outline" className="flex-1" onClick={() => router.back()}>
-                                        Cancel
-                                    </Button>
-                                    <Button type="submit" className="flex-1" disabled={loading}>
-                                        {loading ? (
-                                            <>
-                                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                                Saving...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <CheckCircle className="h-4 w-4 mr-2" />
-                                                {isEditing ? "Update Appointment" : "Create Appointment"}
-                                            </>
-                                        )}
-                                    </Button>
-                                </div>
-                            </form>
-                        </CardContent>
-                    </Card>
+                                    <Separator />
 
-                    {/* Quick Summary */}
-                    {(selectedPatient || selectedDoctor) && (
-                        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {selectedPatient && (
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle className="text-base flex items-center gap-2">
-                                            <User className="h-4 w-4" />
-                                            Patient Summary
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="space-y-2">
-                                        <div>
-                                            <p className="text-sm font-medium">
-                                                {selectedPatient.firstName} {selectedPatient.lastName}
-                                            </p>
-                                            <p className="text-xs text-gray-600">{selectedPatient.phone}</p>
-                                            <p className="text-xs text-gray-600">{selectedPatient.email}</p>
+                                    {/* Date, Time & Type */}
+                                    <section>
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <Clock className="h-4 w-4 text-muted-foreground" />
+                                            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">
+                                                Schedule & Type
+                                            </h3>
                                         </div>
-                                        {selectedPatient.medicalHistory.length > 0 && (
-                                            <div>
-                                                <p className="text-xs font-medium text-gray-600 mb-1">
-                                                    Medical History:
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="date">
+                                                    Date <span className="text-destructive">*</span>
+                                                </Label>
+                                                <Input
+                                                    id="date"
+                                                    type="date"
+                                                    value={formData.date ?? ""}
+                                                    onChange={(e) => handleChange("date", e.target.value)}
+                                                    className={errors.date ? "border-destructive ring-destructive/20" : ""}
+                                                />
+                                                {errors.date && (
+                                                    <p className="text-xs text-destructive flex items-center gap-1">
+                                                        <AlertCircle className="h-3 w-3" />
+                                                        {errors.date}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label htmlFor="time">
+                                                    Time <span className="text-destructive">*</span>
+                                                </Label>
+                                                <Input
+                                                    id="time"
+                                                    type="time"
+                                                    value={formData.time ?? ""}
+                                                    onChange={(e) => handleChange("time", e.target.value)}
+                                                    className={errors.time ? "border-destructive ring-destructive/20" : ""}
+                                                />
+                                                {errors.time && (
+                                                    <p className="text-xs text-destructive flex items-center gap-1">
+                                                        <AlertCircle className="h-3 w-3" />
+                                                        {errors.time}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label htmlFor="type">
+                                                    Type <span className="text-destructive">*</span>
+                                                </Label>
+                                                <Select
+                                                    value={formData.type ?? "consultation"}
+                                                    onValueChange={(v) => handleChange("type", v)}
+                                                >
+                                                    <SelectTrigger
+                                                        id="type"
+                                                        className={errors.type ? "border-destructive ring-destructive/20" : ""}
+                                                    >
+                                                        <SelectValue placeholder="Select type" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="consultation">Consultation</SelectItem>
+                                                        <SelectItem value="follow-up">Follow-up</SelectItem>
+                                                        <SelectItem value="emergency">Emergency</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                {errors.type && (
+                                                    <p className="text-xs text-destructive flex items-center gap-1">
+                                                        <AlertCircle className="h-3 w-3" />
+                                                        {errors.type}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <Separator />
+
+                                    {/* Visit Details */}
+                                    <section>
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <FileText className="h-4 w-4 text-muted-foreground" />
+                                            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">
+                                                Visit Details
+                                            </h3>
+                                        </div>
+                                        <div className="space-y-5">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="visitReason">Visit Reason</Label>
+                                                <Input
+                                                    id="visitReason"
+                                                    placeholder="e.g., Annual checkup, Follow-up on test results"
+                                                    value={formData.visitReason ?? ""}
+                                                    onChange={(e) => handleChange("visitReason", e.target.value)}
+                                                />
+                                                <p className="text-xs text-muted-foreground">
+                                                    Brief description of why the patient is visiting
                                                 </p>
-                                                <div className="flex flex-wrap gap-1">
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label htmlFor="notes">Internal Notes</Label>
+                                                <Textarea
+                                                    id="notes"
+                                                    placeholder="Add any additional notes for internal reference..."
+                                                    value={formData.notes ?? ""}
+                                                    onChange={(e) => handleChange("notes", e.target.value)}
+                                                    className="min-h-[100px] resize-none"
+                                                />
+                                                <p className="text-xs text-muted-foreground">
+                                                    These notes are for internal use only and not visible to patients
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    {/* Status (only when editing) */}
+                                    {isEditing && (
+                                        <>
+                                            <Separator />
+                                            <section>
+                                                <div className="flex items-center gap-2 mb-4">
+                                                    <Activity className="h-4 w-4 text-muted-foreground" />
+                                                    <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">
+                                                        Status
+                                                    </h3>
+                                                </div>
+                                                <div className="max-w-xs">
+                                                    <div className="space-y-2">
+                                                        <Label htmlFor="status">Appointment Status</Label>
+                                                        <Select
+                                                            value={formData.status ?? "pending"}
+                                                            onValueChange={(v) => handleChange("status", v)}
+                                                        >
+                                                            <SelectTrigger id="status">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="pending">Pending</SelectItem>
+                                                                <SelectItem value="confirmed">Confirmed</SelectItem>
+                                                                <SelectItem value="in-progress">In Progress</SelectItem>
+                                                                <SelectItem value="completed">Completed</SelectItem>
+                                                                <SelectItem value="cancelled">Cancelled</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                                {formData.status === "cancelled" && formData.cancelReason && (
+                                                    <div className="mt-4 flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+                                                        <AlertCircle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+                                                        <div>
+                                                            <p className="text-sm font-medium text-destructive">
+                                                                Cancellation Reason
+                                                            </p>
+                                                            <p className="text-sm text-destructive/80 mt-1">
+                                                                {formData.cancelReason}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </section>
+                                        </>
+                                    )}
+
+                                    {/* Actions */}
+                                    <Separator />
+                                    <div className="flex flex-col-reverse sm:flex-row gap-3 pt-2">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="sm:flex-1"
+                                            onClick={() => router.back()}
+                                        >
+                                            <ArrowLeft className="mr-2 h-4 w-4" />
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            type="submit"
+                                            className="sm:flex-1"
+                                            disabled={loading}
+                                        >
+                                            {loading ? (
+                                                <>
+                                                    <svg
+                                                        className="animate-spin -ml-1 mr-2 h-4 w-4"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <circle
+                                                            className="opacity-25"
+                                                            cx="12"
+                                                            cy="12"
+                                                            r="10"
+                                                            stroke="currentColor"
+                                                            strokeWidth="4"
+                                                        />
+                                                        <path
+                                                            className="opacity-75"
+                                                            fill="currentColor"
+                                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                        />
+                                                    </svg>
+                                                    Saving...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <CheckCircle className="mr-2 h-4 w-4" />
+                                                    {isEditing ? "Update Appointment" : "Schedule Appointment"}
+                                                </>
+                                            )}
+                                        </Button>
+                                    </div>
+                                </form>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Sidebar Summary Cards */}
+                    <div className="lg:col-span-1 space-y-4">
+                        {/* Patient Summary */}
+                        {selectedPatient ? (
+                            <Card className="shadow-sm border-border/60">
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
+                                        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10">
+                                            <User className="h-3.5 w-3.5 text-primary" />
+                                        </div>
+                                        Patient Summary
+                                    </CardTitle>
+                                </CardHeader>
+                                <Separator />
+                                <CardContent className="pt-4 space-y-3">
+                                    <div>
+                                        <p className="text-sm font-semibold text-foreground">
+                                            {selectedPatient.firstName} {selectedPatient.lastName}
+                                        </p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                            <Phone className="h-3 w-3" />
+                                            <span>{selectedPatient.phone}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                            <Mail className="h-3 w-3" />
+                                            <span>{selectedPatient.email}</span>
+                                        </div>
+                                    </div>
+                                    {selectedPatient.medicalHistory.length > 0 && (
+                                        <>
+                                            <Separator />
+                                            <div>
+                                                <p className="text-xs font-medium text-muted-foreground mb-2">
+                                                    Medical History
+                                                </p>
+                                                <div className="flex flex-wrap gap-1.5">
                                                     {selectedPatient.medicalHistory.map((condition) => (
-                                                        <Badge key={condition} variant="secondary" className="text-xs">
+                                                        <Badge
+                                                            key={condition}
+                                                            variant="secondary"
+                                                            className="text-xs font-normal"
+                                                        >
                                                             {condition}
                                                         </Badge>
                                                     ))}
                                                 </div>
                                             </div>
-                                        )}
-                                    </CardContent>
-                                </Card>
-                            )}
+                                        </>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <Card className="shadow-sm border-dashed border-border/60">
+                                <CardContent className="py-8 text-center">
+                                    <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                                        <User className="h-5 w-5 text-muted-foreground" />
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">
+                                        Select a patient to see their summary
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        )}
 
-                            {selectedDoctor && (
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle className="text-base flex items-center gap-2">
-                                            <Stethoscope className="h-4 w-4" />
-                                            Doctor Information
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="space-y-1">
-                                        <p className="text-sm font-medium">{selectedDoctor.name}</p>
+                        {/* Doctor Summary */}
+                        {selectedDoctor ? (
+                            <Card className="shadow-sm border-border/60">
+                                <CardHeader className="pb-3">
+                                    <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
+                                        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10">
+                                            <Stethoscope className="h-3.5 w-3.5 text-primary" />
+                                        </div>
+                                        Doctor Information
+                                    </CardTitle>
+                                </CardHeader>
+                                <Separator />
+                                <CardContent className="pt-4 space-y-3">
+                                    <p className="text-sm font-semibold text-foreground">{selectedDoctor.name}</p>
+                                    <div className="space-y-2">
                                         {selectedDoctor.specialization && (
-                                            <p className="text-xs text-gray-600">
-                                                Specialization: {selectedDoctor.specialization}
-                                            </p>
+                                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                <Activity className="h-3 w-3" />
+                                                <span>{selectedDoctor.specialization}</span>
+                                            </div>
                                         )}
-                                        {selectedDoctor.department && (
-                                            <p className="text-xs text-gray-600">
-                                                Department: {selectedDoctor.department}
-                                            </p>
-                                        )}
-                                        <p className="text-xs text-gray-600">{selectedDoctor.email}</p>
-                                    </CardContent>
-                                </Card>
-                            )}
-                        </div>
-                    )}
+                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                            <Mail className="h-3 w-3" />
+                                            <span>{selectedDoctor.email}</span>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <Card className="shadow-sm border-dashed border-border/60">
+                                <CardContent className="py-8 text-center">
+                                    <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                                        <Stethoscope className="h-5 w-5 text-muted-foreground" />
+                                    </div>
+                                    <p className="text-sm text-muted-foreground">
+                                        Select a doctor to see their details
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

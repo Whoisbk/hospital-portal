@@ -1,57 +1,32 @@
 'use client'
 
-import { useAuth } from '@/lib/auth'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Bell, MessageSquare } from 'lucide-react'
+import { SidebarTrigger } from '@/components/ui/sidebar'
+import { Separator } from '@/components/ui/separator'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage } from '@/components/ui/breadcrumb'
 
 interface HeaderProps {
-    title: string
-    description?: string
+  readonly title: string
+  readonly description?: string
 }
 
 export default function Header({ title, description }: HeaderProps) {
-    const { user } = useAuth()
-
-    return (
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-                    {description && (
-                        <p className="text-gray-600 mt-1">{description}</p>
-                    )}
-                </div>
-
-                <div className="flex items-center gap-4">
-                    {/* Notifications */}
-                    <Button variant="ghost" size="sm" className="relative">
-                        <Bell className="h-5 w-5" />
-                        <Badge
-                            variant="destructive"
-                            className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                        >
-                            3
-                        </Badge>
-                    </Button>
-
-                    {/* Messages */}
-                    <Button variant="ghost" size="sm" className="relative">
-                        <MessageSquare className="h-5 w-5" />
-                        <Badge
-                            variant="destructive"
-                            className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                        >
-                            2
-                        </Badge>
-                    </Button>
-
-                    {/* User role badge */}
-                    <Badge variant="secondary" className="capitalize">
-                        {user?.role}
-                    </Badge>
-                </div>
-            </div>
-        </header>
-    )
-} 
+  return (
+    <header className="flex h-16 shrink-0 items-center gap-3 border-b border-border bg-card px-6">
+      <SidebarTrigger className="-ml-2 text-muted-foreground hover:text-foreground" />
+      <Separator orientation="vertical" className="h-5" />
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbPage className="text-foreground font-medium">{title}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      {description && (
+        <>
+          <Separator orientation="vertical" className="h-5" />
+          <span className="text-sm text-muted-foreground hidden md:inline">{description}</span>
+        </>
+      )}
+    </header>
+  )
+}

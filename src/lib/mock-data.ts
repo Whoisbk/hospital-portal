@@ -1,365 +1,287 @@
-import {
-  User,
-  Patient,
-  Appointment,
-  ConsultationNote,
-  Prescription,
-  LabTest,
-  Message,
-  BillingRecord,
-} from "@/types";
+import { Patient } from "@/types"
+export type { Patient }
 
-// Mock doctors and receptionists
-export const MOCK_DOCTORS: User[] = [
-  {
-    id: "2",
-    name: "Dr. Michael Chen",
-    email: "doctor@hospital.com",
-    role: "doctor",
-    specialization: "General Practice",
-    department: "Internal Medicine",
-  },
-  {
-    id: "3",
-    name: "Dr. Sarah Williams",
-    email: "sarah.williams@hospital.com",
-    role: "doctor",
-    specialization: "Cardiology",
-    department: "Cardiology",
-  },
-  {
-    id: "4",
-    name: "Dr. James Brown",
-    email: "james.brown@hospital.com",
-    role: "doctor",
-    specialization: "Pediatrics",
-    department: "Pediatrics",
-  },
-];
+export interface Doctor {
+  id: string
+  name: string
+  specialization: string
+  email: string
+}
 
-export const MOCK_RECEPTIONISTS: User[] = [
-  {
-    id: "1",
-    name: "Sarah Johnson",
-    email: "receptionist@hospital.com",
-    role: "receptionist",
-    department: "Front Desk",
-  },
-  {
-    id: "5",
-    name: "Emma Davis",
-    email: "emma.davis@hospital.com",
-    role: "receptionist",
-    department: "Front Desk",
-  },
-];
+export interface MessageUser {
+  id: string
+  name: string
+  email: string
+  role: string
+}
 
-export const MOCK_USERS: User[] = [...MOCK_DOCTORS, ...MOCK_RECEPTIONISTS];
+export interface Message {
+  id: string
+  senderId: string
+  receiverId: string
+  content: string
+  timestamp: string
+  read: boolean
+  category?: 'general' | 'appointment' | 'urgent'
+  appointmentId?: string
+}
+
+export interface Appointment {
+  id: string
+  patientId: string
+  doctorId: string
+  date: string
+  time: string
+  type: string
+  status: 'pending' | 'confirmed' | 'in-progress' | 'completed' | 'cancelled'
+  notes: string
+  doctor: string
+  visitReason?: string
+}
 
 export const MOCK_PATIENTS: Patient[] = [
   {
-    id: "1",
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@email.com",
-    phone: "+1-555-0123",
-    dateOfBirth: "1985-03-15",
-    address: "123 Main St, Anytown, AT 12345",
-    medicalHistory: ["Hypertension", "Type 2 Diabetes"],
-    emergencyContact: {
-      name: "Jane Doe",
-      phone: "+1-555-0124",
-      relationship: "Spouse",
-    },
-    createdAt: "2024-01-15T10:00:00Z",
-    updatedAt: "2024-07-20T14:30:00Z",
+    id: 'p1',
+    firstName: 'James',
+    lastName: 'Wilson',
+    email: 'james.wilson@email.com',
+    phone: '(555) 123-4567',
+    dateOfBirth: '1985-03-15',
+    address: '123 Maple St, Springfield',
+    medicalHistory: ['Hypertension', 'Type 2 Diabetes'],
+    emergencyContact: { name: 'Linda Wilson', phone: '(555) 123-0001', relationship: 'Spouse' },
+    createdAt: '2024-01-10T08:00:00Z',
+    updatedAt: '2024-07-20T10:00:00Z',
   },
   {
-    id: "2",
-    firstName: "Emily",
-    lastName: "Smith",
-    email: "emily.smith@email.com",
-    phone: "+1-555-0125",
-    dateOfBirth: "1992-08-22",
-    address: "456 Oak Ave, Somewhere, SW 67890",
-    medicalHistory: ["Asthma", "Allergies"],
-    emergencyContact: {
-      name: "Robert Smith",
-      phone: "+1-555-0126",
-      relationship: "Father",
-    },
-    createdAt: "2024-02-10T09:15:00Z",
-    updatedAt: "2024-07-21T11:45:00Z",
+    id: 'p2',
+    firstName: 'Emily',
+    lastName: 'Davis',
+    email: 'emily.davis@email.com',
+    phone: '(555) 234-5678',
+    dateOfBirth: '1992-08-22',
+    address: '456 Oak Ave, Shelbyville',
+    medicalHistory: ['Asthma'],
+    emergencyContact: { name: 'Tom Davis', phone: '(555) 234-0002', relationship: 'Brother' },
+    createdAt: '2024-02-14T08:00:00Z',
+    updatedAt: '2024-07-18T10:00:00Z',
   },
   {
-    id: "3",
-    firstName: "Michael",
-    lastName: "Johnson",
-    email: "michael.johnson@email.com",
-    phone: "+1-555-0127",
-    dateOfBirth: "1978-12-03",
-    address: "789 Pine Rd, Elsewhere, EW 54321",
-    medicalHistory: ["High Cholesterol"],
-    emergencyContact: {
-      name: "Lisa Johnson",
-      phone: "+1-555-0128",
-      relationship: "Wife",
-    },
-    createdAt: "2024-03-05T16:20:00Z",
-    updatedAt: "2024-07-19T13:10:00Z",
+    id: 'p3',
+    firstName: 'Michael',
+    lastName: 'Brown',
+    email: 'michael.brown@email.com',
+    phone: '(555) 345-6789',
+    dateOfBirth: '1978-11-05',
+    address: '789 Pine Rd, Capital City',
+    medicalHistory: ['High Cholesterol', 'Back Pain'],
+    emergencyContact: { name: 'Carol Brown', phone: '(555) 345-0003', relationship: 'Wife' },
+    createdAt: '2024-03-01T08:00:00Z',
+    updatedAt: '2024-07-22T10:00:00Z',
   },
-];
+  {
+    id: 'p4',
+    firstName: 'Sofia',
+    lastName: 'Martinez',
+    email: 'sofia.martinez@email.com',
+    phone: '(555) 456-7890',
+    dateOfBirth: '1995-01-30',
+    address: '321 Elm St, Ogdenville',
+    medicalHistory: [],
+    emergencyContact: { name: 'Carlos Martinez', phone: '(555) 456-0004', relationship: 'Father' },
+    createdAt: '2024-04-05T08:00:00Z',
+    updatedAt: '2024-07-21T10:00:00Z',
+  },
+  {
+    id: 'p5',
+    firstName: 'Robert',
+    lastName: 'Taylor',
+    email: 'robert.taylor@email.com',
+    phone: '(555) 567-8901',
+    dateOfBirth: '1968-06-12',
+    address: '654 Birch Blvd, North Haverbrook',
+    medicalHistory: ['Coronary Artery Disease', 'Obesity'],
+    emergencyContact: { name: 'Nancy Taylor', phone: '(555) 567-0005', relationship: 'Daughter' },
+    createdAt: '2024-05-20T08:00:00Z',
+    updatedAt: '2024-07-19T10:00:00Z',
+  },
+]
 
+// Doctor ids must match auth user ids (lib/auth.tsx) so doctor-filtered appointments work
+export const MOCK_DOCTORS: Doctor[] = [
+  { id: '2', name: 'Dr. Michael Chen', specialization: 'General Practice', email: 'doctor@hospital.com' },
+  { id: '3', name: 'Dr. Sarah Williams', specialization: 'Cardiology', email: 'sarah.williams@hospital.com' },
+  { id: '4', name: 'Dr. James Brown', specialization: 'Pediatrics', email: 'james.brown@hospital.com' },
+]
+
+// doctorId values must match auth doctor user ids (2, 3, 4) for role-based filtering
 export const MOCK_APPOINTMENTS: Appointment[] = [
   {
-    id: "1",
-    patientId: "1",
-    patientName: "John Doe",
-    doctorId: "2",
-    date: "2026-02-04",
-    time: "09:00",
-    type: "consultation",
-    status: "pending",
-    visitReason: "Annual checkup and blood pressure monitoring",
-    notes: "Patient requested morning appointment",
-    createdAt: "2026-02-01T14:00:00Z",
-    updatedAt: "2026-02-01T14:00:00Z",
-    createdBy: "1",
+    id: 'a1',
+    patientId: 'p1',
+    doctorId: '2',
+    date: '2026-02-04',
+    time: '09:00 AM',
+    type: 'follow-up',
+    status: 'completed',
+    notes: 'Post-surgery check-up',
+    doctor: 'Dr. Michael Chen',
+    visitReason: 'Post-surgery recovery assessment',
   },
   {
-    id: "2",
-    patientId: "2",
-    patientName: "Emily Smith",
-    doctorId: "2",
-    date: "2026-02-04",
-    time: "10:30",
-    type: "follow-up",
-    status: "confirmed",
-    visitReason: "Asthma follow-up and prescription renewal",
-    notes: "Bring previous prescription",
-    createdAt: "2026-01-28T10:30:00Z",
-    updatedAt: "2026-02-03T09:00:00Z",
-    createdBy: "1",
+    id: 'a2',
+    patientId: 'p2',
+    doctorId: '2',
+    date: '2026-02-04',
+    time: '10:30 AM',
+    type: 'consultation',
+    status: 'in-progress',
+    notes: 'Initial consultation for headaches',
+    doctor: 'Dr. Michael Chen',
+    visitReason: 'Recurring migraine headaches',
   },
   {
-    id: "3",
-    patientId: "3",
-    patientName: "Michael Johnson",
-    doctorId: "3",
-    date: "2026-02-03",
-    time: "14:00",
-    type: "consultation",
-    status: "completed",
-    visitReason: "Cholesterol review and heart health assessment",
-    notes: "Review lab test results",
-    createdAt: "2026-01-25T09:00:00Z",
-    updatedAt: "2026-02-03T15:30:00Z",
-    createdBy: "1",
+    id: 'a3',
+    patientId: 'p3',
+    doctorId: '2',
+    date: '2026-02-04',
+    time: '02:00 PM',
+    type: 'check-up',
+    status: 'confirmed',
+    notes: 'Annual physical examination',
+    doctor: 'Dr. Michael Chen',
+    visitReason: 'Annual physical examination',
   },
   {
-    id: "4",
-    patientId: "1",
-    patientName: "John Doe",
-    doctorId: "2",
-    date: "2026-02-04",
-    time: "14:00",
-    type: "consultation",
-    status: "confirmed",
-    visitReason: "Diabetes monitoring and medication adjustment",
-    notes: "Fasting blood sugar test required",
-    createdAt: "2026-01-30T11:00:00Z",
-    updatedAt: "2026-02-02T15:30:00Z",
-    createdBy: "1",
+    id: 'a4',
+    patientId: 'p4',
+    doctorId: '2',
+    date: '2026-02-04',
+    time: '03:30 PM',
+    type: 'lab-review',
+    status: 'pending',
+    notes: 'Blood work results discussion',
+    doctor: 'Dr. Michael Chen',
+    visitReason: 'Blood work results discussion',
   },
   {
-    id: "5",
-    patientId: "2",
-    patientName: "Emily Smith",
-    doctorId: "4",
-    date: "2026-02-05",
-    time: "11:00",
-    type: "consultation",
-    status: "pending",
-    visitReason: "Allergy consultation",
-    notes: "Patient experiencing seasonal allergies",
-    createdAt: "2026-02-03T16:00:00Z",
-    updatedAt: "2026-02-03T16:00:00Z",
-    createdBy: "5",
+    id: 'a5',
+    patientId: 'p5',
+    doctorId: '3',
+    date: '2026-02-05',
+    time: '09:00 AM',
+    type: 'consultation',
+    status: 'confirmed',
+    notes: 'Heart palpitations evaluation',
+    doctor: 'Dr. Sarah Williams',
+    visitReason: 'Heart palpitations and chest discomfort',
   },
   {
-    id: "6",
-    patientId: "3",
-    patientName: "Michael Johnson",
-    doctorId: "2",
-    date: "2026-02-01",
-    time: "10:00",
-    type: "follow-up",
-    status: "cancelled",
-    visitReason: "Follow-up consultation",
-    notes: "Patient cancelled due to work commitment",
-    cancelReason: "Patient requested cancellation - rescheduled",
-    createdAt: "2026-01-20T09:00:00Z",
-    updatedAt: "2026-02-01T08:00:00Z",
-    createdBy: "1",
+    id: 'a6',
+    patientId: 'p1',
+    doctorId: '4',
+    date: '2026-02-05',
+    time: '11:00 AM',
+    type: 'follow-up',
+    status: 'pending',
+    notes: 'Follow-up on medication',
+    doctor: 'Dr. James Brown',
+    visitReason: 'Medication adjustment review',
   },
-];
+  {
+    id: 'a7',
+    patientId: 'p3',
+    doctorId: '2',
+    date: '2026-02-06',
+    time: '10:00 AM',
+    type: 'check-up',
+    status: 'pending',
+    notes: 'Routine check-up',
+    doctor: 'Dr. Michael Chen',
+    visitReason: 'Routine wellness check-up',
+  },
+  {
+    id: 'a8',
+    patientId: 'p2',
+    doctorId: '3',
+    date: '2026-02-01',
+    time: '02:30 PM',
+    type: 'consultation',
+    status: 'completed',
+    notes: 'Initial cardiac assessment',
+    doctor: 'Dr. Sarah Williams',
+    visitReason: 'Cardiac assessment',
+  },
+  {
+    id: 'a9',
+    patientId: 'p4',
+    doctorId: '2',
+    date: '2026-01-28',
+    time: '09:30 AM',
+    type: 'follow-up',
+    status: 'cancelled',
+    notes: 'Patient requested cancellation',
+    doctor: 'Dr. Michael Chen',
+    visitReason: 'Follow-up consultation',
+  },
+]
 
-export const MOCK_CONSULTATION_NOTES: ConsultationNote[] = [
-  {
-    id: "1",
-    appointmentId: "3",
-    doctorId: "2",
-    notes:
-      "Patient reports feeling well. Blood pressure within normal range. Continue current medication.",
-    diagnosis: "Hypertension - well controlled",
-    treatment: "Continue Lisinopril 10mg daily",
-    createdAt: "2024-07-21T14:45:00Z",
-  },
-];
-
-export const MOCK_PRESCRIPTIONS: Prescription[] = [
-  {
-    id: "1",
-    patientId: "1",
-    doctorId: "2",
-    appointmentId: "3",
-    medications: [
-      {
-        name: "Lisinopril",
-        dosage: "10mg",
-        frequency: "Once daily",
-        duration: "30 days",
-        instructions: "Take with food",
-      },
-      {
-        name: "Metformin",
-        dosage: "500mg",
-        frequency: "Twice daily",
-        duration: "30 days",
-        instructions: "Take with meals",
-      },
-    ],
-    createdAt: "2024-07-21T14:50:00Z",
-  },
-];
-
-export const MOCK_LAB_TESTS: LabTest[] = [
-  {
-    id: "1",
-    patientId: "1",
-    doctorId: "2",
-    appointmentId: "1",
-    testType: "Complete Blood Count",
-    status: "requested",
-    requestedAt: "2024-07-21T15:00:00Z",
-  },
-  {
-    id: "2",
-    patientId: "3",
-    doctorId: "2",
-    appointmentId: "3",
-    testType: "Lipid Panel",
-    status: "completed",
-    results:
-      "Total cholesterol: 180 mg/dL (Normal). LDL: 100 mg/dL (Borderline high).",
-    requestedAt: "2024-07-20T14:00:00Z",
-    completedAt: "2024-07-21T10:30:00Z",
-  },
-];
+// Users that can send/receive messages (matches auth user ids: 1,2,3,4,5,6)
+export const MOCK_USERS: MessageUser[] = [
+  { id: '1', name: 'Sarah Johnson', email: 'receptionist@hospital.com', role: 'receptionist' },
+  { id: '2', name: 'Dr. Michael Chen', email: 'doctor@hospital.com', role: 'doctor' },
+  { id: '3', name: 'Dr. Sarah Williams', email: 'sarah.williams@hospital.com', role: 'doctor' },
+  { id: '4', name: 'Dr. James Brown', email: 'james.brown@hospital.com', role: 'doctor' },
+  { id: '5', name: 'Emma Davis', email: 'emma.davis@hospital.com', role: 'receptionist' },
+  { id: '6', name: 'Admin User', email: 'admin@hospital.com', role: 'admin' },
+]
 
 export const MOCK_MESSAGES: Message[] = [
   {
-    id: "1",
-    senderId: "1",
-    receiverId: "2",
-    content: "Dr. Chen, patient John Doe has arrived early for his 9 AM appointment.",
-    timestamp: "2026-02-04T08:45:00Z",
+    id: 'm1',
+    senderId: '1',
+    receiverId: '2',
+    content: 'Dr. Chen, could you confirm the 9 AM slot for James Wilson tomorrow?',
+    timestamp: '2026-02-03T09:00:00Z',
     read: true,
-    readAt: "2026-02-04T08:46:00Z",
-    appointmentId: "1",
-    category: "appointment",
+    category: 'appointment',
+    appointmentId: 'a1',
   },
   {
-    id: "2",
-    senderId: "2",
-    receiverId: "1",
-    content: "Thanks Sarah, I'll be ready in 5 minutes.",
-    timestamp: "2026-02-04T08:47:00Z",
+    id: 'm2',
+    senderId: '2',
+    receiverId: '1',
+    content: 'Confirmed. I have him down for the post-surgery check-up.',
+    timestamp: '2026-02-03T09:15:00Z',
     read: true,
-    readAt: "2026-02-04T08:47:30Z",
-    appointmentId: "1",
-    category: "appointment",
+    category: 'appointment',
+    appointmentId: 'a1',
   },
   {
-    id: "3",
-    senderId: "1",
-    receiverId: "2",
-    content: "Emily Smith called - she's running 15 minutes late for her 10:30 appointment.",
-    timestamp: "2026-02-04T10:10:00Z",
+    id: 'm3',
+    senderId: '2',
+    receiverId: '3',
+    content: 'Sarah, can you take a look at the cardiac referral for Emily Davis?',
+    timestamp: '2026-02-04T08:30:00Z',
+    read: true,
+    category: 'general',
+  },
+  {
+    id: 'm4',
+    senderId: '1',
+    receiverId: '2',
+    content: 'Urgent: Patient in room 4 needs immediate attention.',
+    timestamp: '2026-02-04T10:45:00Z',
     read: false,
-    appointmentId: "2",
-    category: "urgent",
+    category: 'urgent',
   },
   {
-    id: "4",
-    senderId: "2",
-    receiverId: "1",
-    content: "No problem, I can see the next patient first.",
-    timestamp: "2026-02-04T10:12:00Z",
+    id: 'm5',
+    senderId: '3',
+    receiverId: '2',
+    content: 'I will review the referral and get back to you by EOD.',
+    timestamp: '2026-02-04T09:00:00Z',
     read: true,
-    readAt: "2026-02-04T10:13:00Z",
-    appointmentId: "2",
-    category: "appointment",
+    category: 'general',
   },
-  {
-    id: "5",
-    senderId: "3",
-    receiverId: "1",
-    content: "Room 3 will be available earlier today. Can we move some afternoon appointments?",
-    timestamp: "2026-02-04T09:30:00Z",
-    read: true,
-    readAt: "2026-02-04T09:35:00Z",
-    category: "general",
-  },
-  {
-    id: "6",
-    senderId: "1",
-    receiverId: "3",
-    content: "Yes, I can adjust the 2 PM appointments. I'll send you the updated schedule.",
-    timestamp: "2026-02-04T09:40:00Z",
-    read: true,
-    readAt: "2026-02-04T09:41:00Z",
-    category: "general",
-  },
-];
-
-export const MOCK_BILLING_RECORDS: BillingRecord[] = [
-  {
-    id: "1",
-    patientId: "1",
-    appointmentId: "3",
-    amount: 150.0,
-    description: "Consultation - Diabetes follow-up",
-    status: "paid",
-    createdAt: "2024-07-21T15:00:00Z",
-    paidAt: "2024-07-21T16:30:00Z",
-  },
-  {
-    id: "2",
-    patientId: "2",
-    appointmentId: "2",
-    amount: 125.0,
-    description: "Consultation - Asthma follow-up",
-    status: "pending",
-    createdAt: "2024-07-22T10:30:00Z",
-  },
-  {
-    id: "3",
-    patientId: "3",
-    appointmentId: "3",
-    amount: 200.0,
-    description: "Consultation + Lab Tests",
-    status: "pending",
-    createdAt: "2024-07-21T14:00:00Z",
-  },
-];
+]

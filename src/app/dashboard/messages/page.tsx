@@ -404,16 +404,19 @@ export default function MessagesPage() {
                                                 return (
                                                     <div key={message.id} className="space-y-2">
                                                         {/* Appointment Context */}
-                                                        {message.appointmentId && appointment && (
-                                                            <div className="flex justify-center">
-                                                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-xs flex items-center gap-2 max-w-md">
-                                                                    <Calendar className="h-3 w-3 text-blue-600" />
-                                                                    <span className="text-blue-800">
-                                                                        Regarding: {appointment.patientName} - {appointment.date} {appointment.time}
-                                                                    </span>
+                                                        {message.appointmentId && appointment && (() => {
+                                                            const patient = MOCK_PATIENTS.find(p => p.id === appointment.patientId)
+                                                            return (
+                                                                <div className="flex justify-center">
+                                                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-xs flex items-center gap-2 max-w-md">
+                                                                        <Calendar className="h-3 w-3 text-blue-600" />
+                                                                        <span className="text-blue-800">
+                                                                            Regarding: {patient ? `${patient.firstName} ${patient.lastName}` : 'Patient'} - {appointment.date} {appointment.time}
+                                                                        </span>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        )}
+                                                            )
+                                                        })()}
 
                                                         <div
                                                             className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}

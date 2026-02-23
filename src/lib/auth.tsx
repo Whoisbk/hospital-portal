@@ -82,6 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (foundUser && password === 'password123') {
             setUser(foundUser)
             localStorage.setItem('hospital-user', JSON.stringify(foundUser))
+            document.cookie = 'auth-token=authenticated; path=/; SameSite=Lax'
             setIsLoading(false)
             return true
         }
@@ -93,6 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const logout = () => {
         setUser(null)
         localStorage.removeItem('hospital-user')
+        document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
     }
 
     return (
