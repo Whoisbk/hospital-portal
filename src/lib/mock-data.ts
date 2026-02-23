@@ -39,6 +39,22 @@ export interface Appointment {
   visitReason?: string
 }
 
+export interface PrescriptionMedication {
+  name: string
+  dosage: string
+  frequency: string
+  duration: string
+  instructions: string
+}
+
+export interface Prescription {
+  id: string
+  patientId: string
+  appointmentId: string
+  createdAt: string
+  medications: PrescriptionMedication[]
+}
+
 export const MOCK_PATIENTS: Patient[] = [
   {
     id: 'p1',
@@ -223,6 +239,38 @@ export const MOCK_APPOINTMENTS: Appointment[] = [
     notes: 'Patient requested cancellation',
     doctor: 'Dr. Michael Chen',
     visitReason: 'Follow-up consultation',
+  },
+]
+
+export const MOCK_PRESCRIPTIONS: Prescription[] = [
+  {
+    id: 'rx1',
+    patientId: 'p1',
+    appointmentId: 'a1',
+    createdAt: '2026-02-04T10:00:00Z',
+    medications: [
+      { name: 'Lisinopril', dosage: '10mg', frequency: 'Once daily', duration: '30 days', instructions: 'Take in the morning with food' },
+      { name: 'Metformin', dosage: '500mg', frequency: 'Twice daily', duration: '90 days', instructions: 'Take with meals' },
+    ],
+  },
+  {
+    id: 'rx2',
+    patientId: 'p2',
+    appointmentId: 'a8',
+    createdAt: '2026-02-01T15:00:00Z',
+    medications: [
+      { name: 'Atenolol', dosage: '25mg', frequency: 'Once daily', duration: '30 days', instructions: 'Take at the same time each day' },
+    ],
+  },
+  {
+    id: 'rx3',
+    patientId: 'p3',
+    appointmentId: 'a3',
+    createdAt: '2026-02-04T14:30:00Z',
+    medications: [
+      { name: 'Atorvastatin', dosage: '20mg', frequency: 'Once daily', duration: '90 days', instructions: 'Take at bedtime' },
+      { name: 'Ibuprofen', dosage: '400mg', frequency: 'As needed', duration: '7 days', instructions: 'Take with food for back pain' },
+    ],
   },
 ]
 
